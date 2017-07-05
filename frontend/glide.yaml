@@ -1,0 +1,11 @@
+package: github.com/dvonthenen/cloud-native-demo/frontend
+import:
+- package: github.com/opentracing/opentracing-go
+  ref:     v1.0.2
+  vcs:     git
+- package: github.com/openzipkin/zipkin-go-opentracing
+  ref:     v0.2.4
+  vcs:     git
+- package: github.com/prometheus/client_golang
+  ref:     v0.8.0
+  vcs:     git
