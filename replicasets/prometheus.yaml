@@ -17,9 +17,9 @@ spec:
     spec:
       containers:
         - name: prometheus
-          image: "prom/prometheus:1.7.1"
+          image: "prom/prometheus:v1.7.1"
           args:
-            - "-config.file=/etc/prometheus/config.yml"
+            - "-config.file=/etc/prometheus/config.yaml"
             - "-storage.local.path=/var/lib/prometheus"
             - "-web.listen-address=0.0.0.0:9090"
           volumeMounts:
