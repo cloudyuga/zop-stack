@@ -6,6 +6,7 @@ metadata:
   name: zipkin
   namespace: kube-system
 spec:
+  type: NodePort
   ports:
   - port: 9411
     protocol: TCP
@@ -13,4 +14,3 @@ spec:
   selector:
     k8s-app: zipkin
   sessionAffinity: None
-  type: ClusterIP
