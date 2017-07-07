@@ -14,6 +14,11 @@ spec:
       containers:
         - name: frontend
           image: "dvonthenen/frontend:latest"
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           args:
             - "--advertised-ip=$(POD_IP)"
             - "--backend=http://backend:8080"
