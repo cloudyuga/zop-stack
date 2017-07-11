@@ -34,3 +34,11 @@ scrape_configs:
     scheme: 'http'
     static_configs:
       - targets: ['zipkin:9411']
+  - job_name: 'frontend'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['frontend.default.svc.cluster.local:80']
+  - job_name: 'backend'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['backend.default.svc.cluster.local:80']

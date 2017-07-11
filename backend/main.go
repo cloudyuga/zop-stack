@@ -13,10 +13,11 @@ package main
 
 import (
 	"flag"
-	"log"
 	"net"
 	"net/http"
+	"os"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	zipkin "github.com/openzipkin/zipkin-go-opentracing"
@@ -54,16 +55,30 @@ var (
 
 func init() {
 	prometheus.MustRegister(httpRequestsCounter)
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.InfoLevel)
+}
+
+func env(key, defaultValue string) (value string) {
+	if value = os.Getenv(key); value == "" {
+		value = defaultValue
+	}
+	return
 }
 
 func main() {
 	var err error
 
-	flag.StringVar(&advertisedIP, "advertised-ip", "", "The advertised IP address")
+	advertisedIP = env("POD_IP", "127.0.0.1")
 	flag.StringVar(&listenIP, "listen-ip", defaultListenIP, "The HTTP bind IP address")
 	flag.StringVar(&listenPort, "listen-port", defaultListenPort, "The HTTP port")
 	flag.StringVar(&zipkinURL, "zipkin", defaultZipkinURL, "The Zipkin tracer URL")
 	flag.Parse()
+
+	log.Info("advertisedIP:", advertisedIP)
+	log.Info("listenIP:", listenIP)
+	log.Info("listenPort:", listenPort)
+	log.Info("zipkinURL:", zipkinURL)
 
 	httpAddr := net.JoinHostPort(listenIP, listenPort)
 	serviceAddr := net.JoinHostPort(advertisedIP, listenPort)
@@ -73,10 +88,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	recorder := zipkin.NewRecorder(collector, false, serviceAddr, "backend")
-	tracer, err = zipkin.NewTracer(recorder, zipkin.TraceID128Bit(true))
+	recorder := zipkin.NewRecorder(collector, true, serviceAddr, "backend")
+	tracer, err = zipkin.NewTracer(recorder,
+		zipkin.ClientServerSameSpan(true),
+		zipkin.TraceID128Bit(true))
 	if err != nil {
-		log.Fatal("unable to create Zipkin tracer: %+v", err)
+		log.Fatal("unable to create Zipkin tracer: ", err)
 	}
 	opentracing.InitGlobalTracer(tracer)
 
@@ -88,43 +105,49 @@ func main() {
 func handler(w http.ResponseWriter, r *http.Request) {
 	var span opentracing.Span
 
+	log.Info("Extract")
 	spanContext, err := opentracing.GlobalTracer().Extract(
 		opentracing.HTTPHeaders,
 		opentracing.HTTPHeadersCarrier(r.Header),
 	)
 
 	if err != nil {
-		log.Printf("error extracting opentracing headers: %v", err)
+		log.Error("error extracting opentracing headers:", err)
 		httpRequestsCounter.WithLabelValues(r.Method, "500").Inc()
 		http.Error(w, "service unavailable", 500)
 		return
 	}
 
+	log.Info("StartSpan")
 	span = opentracing.StartSpan("backend", ext.RPCServerOption(spanContext))
 	defer span.Finish()
 
-	httpRequest, err := http.NewRequest(http.MethodGet, "https://google.com", nil)
+	log.Info("NewRequest")
+	httpRequest, err := http.NewRequest(http.MethodGet, "http://www.google.com", nil)
 	if err != nil {
-		log.Printf("error creating new HTTP request: %v", err)
+		log.Error("error creating new HTTP request:", err)
 		httpRequestsCounter.WithLabelValues(r.Method, "500").Inc()
 		http.Error(w, "service unavailable", 500)
 		return
 	}
 
+	log.Info("StartSpan")
 	childSpan := opentracing.StartSpan(
 		"get google.com",
 		opentracing.ChildOf(span.Context()),
 	)
 	defer childSpan.Finish()
 
+	log.Info("Do")
 	resp, err := http.DefaultClient.Do(httpRequest)
 	if err != nil {
-		log.Printf("error running http request: %v", err)
+		log.Error("error running http request:", err)
 		httpRequestsCounter.WithLabelValues(r.Method, "500").Inc()
 		http.Error(w, "service unavailable", 500)
 		return
 	}
 	resp.Body.Close()
 
+	log.Info("WithLabelValues")
 	httpRequestsCounter.WithLabelValues(r.Method, "200").Inc()
 }

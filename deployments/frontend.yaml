@@ -14,13 +14,13 @@ spec:
       containers:
         - name: frontend
           image: "dvonthenen/frontend:latest"
+          imagePullPolicy: Always
           env:
             - name: POD_IP
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
           args:
-            - "--advertised-ip=$(POD_IP)"
             - "--backend=http://backend:80"
             - "--listen-ip=0.0.0.0"
             - "--listen-port=80"

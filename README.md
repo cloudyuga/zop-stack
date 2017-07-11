@@ -29,16 +29,16 @@ docker push dvonthenen/frontend:latest
 
 docker ps --filter "status=exited" | awk '{print $1}' | xargs docker rm
 
-
+IMPORTANT: Dont forget to fix ports on GCE!!!!!
 
 
 # Teardown
+kubectl delete deployment frontend
+kubectl delete deployment backend
+kubectl delete deployment prometheus --namespace=kube-system
+kubectl delete deployment zipkin --namespace=kube-system
 kubectl delete service frontend
 kubectl delete service backend
 kubectl delete service prometheus --namespace=kube-system
 kubectl delete service zipkin --namespace=kube-system
-kubectl delete replicaset frontend
-kubectl delete replicaset backend
-kubectl delete replicaset prometheus --namespace=kube-system
-kubectl delete replicaset zipkin --namespace=kube-system
 kubectl delete configmap prometheus --namespace=kube-system
