@@ -20,7 +20,9 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
-          args:
-            - "--listen-ip=0.0.0.0"
-            - "--listen-port=80"
-            - "--zipkin=http://zipkin.kube-system.svc.cluster.local:9411/api/v1/spans"
+            - name: LISTEN_IP
+              value: "0.0.0.0"
+            - name: LISTEN_PORT
+              value: "80"
+            - name: ZIPKIN_URI
+              value: "http://zipkin.kube-system.svc.cluster.local:9411/api/v1/spans"

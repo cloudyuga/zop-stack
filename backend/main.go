@@ -12,13 +12,12 @@
 package main
 
 import (
-	"flag"
 	"net"
 	"net/http"
 	"os"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/opentracing/opentracing-go"
+	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	zipkin "github.com/openzipkin/zipkin-go-opentracing"
 	"github.com/prometheus/client_golang/prometheus"
@@ -70,10 +69,9 @@ func main() {
 	var err error
 
 	advertisedIP = env("POD_IP", "127.0.0.1")
-	flag.StringVar(&listenIP, "listen-ip", defaultListenIP, "The HTTP bind IP address")
-	flag.StringVar(&listenPort, "listen-port", defaultListenPort, "The HTTP port")
-	flag.StringVar(&zipkinURL, "zipkin", defaultZipkinURL, "The Zipkin tracer URL")
-	flag.Parse()
+	listenIP = env("LISTEN_IP", defaultListenIP)
+	listenPort = env("LISTEN_PORT", defaultListenPort)
+	zipkinURL = env("ZIPKIN_URI", defaultListenPort)
 
 	log.Info("advertisedIP:", advertisedIP)
 	log.Info("listenIP:", listenIP)

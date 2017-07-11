@@ -12,7 +12,6 @@
 package main
 
 import (
-	"flag"
 	"net"
 	"net/http"
 	"os"
@@ -71,11 +70,10 @@ func main() {
 	var err error
 
 	advertisedIP = env("POD_IP", "127.0.0.1")
-	flag.StringVar(&listenIP, "listen-ip", defaultListenIP, "The HTTP bind IP address")
-	flag.StringVar(&listenPort, "listen-port", defaultListenPort, "The HTTP port")
-	flag.StringVar(&backendURL, "backend", defaultBackendURL, "The backend URL")
-	flag.StringVar(&zipkinURL, "zipkin", defaultZipkinURL, "The Zipkin tracer URL")
-	flag.Parse()
+	listenIP = env("LISTEN_IP", defaultListenIP)
+	listenPort = env("LISTEN_PORT", defaultListenPort)
+	backendURL = env("BACKEND_URI", defaultBackendURL)
+	zipkinURL = env("ZIPKIN_URI", defaultListenPort)
 
 	log.Info("advertisedIP:", advertisedIP)
 	log.Info("listenIP:", listenIP)
