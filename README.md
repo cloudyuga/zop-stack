@@ -31,7 +31,7 @@ kubectl create -f backend.yaml
 kubectl create -f frontend.yaml
 
 
-Building:
+### Building the Docker Images
 backend:
 ./build.sh
 docker build -t dvonthenen/backend .
@@ -43,14 +43,14 @@ docker build -t dvonthenen/frontend .
 docker push dvonthenen/frontend:latest
 
 
-Scaleio:
+### ScaleIO Clean Up
 scli --login --username admin --password Scaleio123
 scli --query_all_volumes
 scli --unmap_volume_from_sdc --all_sdc --volume_name XXXXXX --i_am_sure
 scli --remove_volume --volume_name XXXX
 
 
-Debugging:
+### Random Debugging Stuff
 docker ps --filter "status=exited" | awk '{print $1}' | xargs docker rm
 
 docker run -ti --entrypoint=/bin/sh -p 9090:9090 prom/prometheus:v1.7.1
