@@ -12,6 +12,8 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
@@ -137,7 +139,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "service unavailable", 500)
 		return
 	}
-	resp.Body.Close()
+	defer resp.Body.Close()
+
+	byHTTP, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error("error running ReadAll:", err)
+		httpRequestsCounter.WithLabelValues(r.Method, "500").Inc()
+		http.Error(w, "service unavailable", 500)
+		return
+	}
+	fmt.Fprintf(w, string(byHTTP))
 
 	httpRequestsCounter.WithLabelValues(r.Method, "200").Inc()
 }
