@@ -7,9 +7,6 @@ kubectl create configmap prometheus --from-file=config.yaml --namespace=kube-sys
 kubectl create -f scaleio-default.yaml
 kubectl create -f scaleio-kubesystem.yaml
 
-cd accounts
-kubectl create -f default.yaml
-
 cd services
 kubectl create -f zipkin.yaml
 kubectl create -f prometheus.yaml
@@ -25,7 +22,8 @@ kubectl create -f persistvolumeclaim-kubesystem.yaml
 cd deployments
 kubectl create -f zipkin.yaml
 kubectl create -f prometheus-scratch.yaml
-kubectl create -f prometheus-persistent.yaml
+kubectl create -f prometheus-simple.yaml
+kubectl create -f prometheus-dynamic.yaml
 kubectl create -f grafana.yaml
 kubectl create -f backend.yaml
 kubectl create -f frontend.yaml
@@ -48,6 +46,8 @@ scli --login --username admin --password Scaleio123
 scli --query_all_volumes
 scli --unmap_volume_from_sdc --all_sdc --volume_name XXXXXX --i_am_sure
 scli --remove_volume --volume_name XXXX
+
+scli --mdm_ip 10.138.0.6 --add_volume --size_gb 32 --volume_name prometheus --protection_domain_name default --storage_pool_name default
 
 
 ### Random Debugging Stuff
@@ -74,7 +74,6 @@ kubectl delete service backend
 kubectl delete service grafana --namespace=kube-system
 kubectl delete service prometheus --namespace=kube-system
 kubectl delete service zipkin --namespace=kube-system
-kubectl delete serviceaccount default --namespace=kube-system
 kubectl delete secret sio-secret
 kubectl delete secret sio-secret --namespace=kube-system
 kubectl delete configmap prometheus --namespace=kube-system
