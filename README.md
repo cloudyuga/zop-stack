@@ -1,10 +1,14 @@
 # ZOP Demo
 
-## Installation
+## Before we begin...
 
-Before we begin, you will need to have an existing Kubernetes cluster up and running with a decent amount of memory and CPU on each Kubernetes worker node. If you need to stand up a cluster, there is documentation available on the official Kubernetes site for [setup](https://kubernetes.io/docs/setup/). It is assumed that you have a good understanding and grasp at operating/navigating a Kubernetes cluster.
+This step-by-step walkthrough was initially forked from Kelsey Hightower's CNCF demo repo (located here: https://github.com/kelseyhightower/cloud-native-demo/). I was tasked look into standing up a ZOP stack, but a lot of the explanation of what was going on, how to deploy the individual components, and etc was missing from that repo. Additionally, a number of changes have been made to the Kubernetes YAML files (going from ReplicaSets to Deployments, using NodePorts), the Prometheus configuration file itself (adds in Kubernetes, Zipkin, and Prometheus monitoring), and even the code to the Sample Application itself (I was not able to get the program to run correctly without these modifications).
+
+Before we begin, you will need to have an existing Kubernetes cluster up and running with a decent amount of memory and CPU on each Kubernetes worker node. If you need to stand up a cluster, there is documentation available on the official Kubernetes site for [setup](https://kubernetes.io/docs/setup/). It is assumed that you have a good understanding and grasp operating/navigating a Kubernetes cluster.
 
 To simplify and condense this walkthrough, you can find all configuration files this GitHub repo.
+
+## Installation
 
 ### Deploying Zipkin
 <pre>
