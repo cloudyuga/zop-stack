@@ -10,6 +10,24 @@ To simplify and condense this walkthrough, you can find all configuration files 
 
 ## Installation
 
+### Storage Persistency with Prometheus
+<pre>
+# We need to create a k8s secret to hold onto the username and
+# password for ScaleIO
+cd configs
+kubectl create -f scaleio-default.yaml
+kubectl create -f scaleio-kubesystem.yaml
+cd ..
+
+# We need to define the configuration parameters both for ScaleIO
+# and also hooking up k8s persistent volume claims
+cd scaleio
+kubectl create -f storageclass.yaml
+kubectl create -f persistvolumeclaim-default.yaml
+kubectl create -f persistvolumeclaim-kubesystem.yaml
+cd ..
+</pre>
+
 ### Deploying Zipkin
 <pre>
 # We need to open up the Zipkin port to access the UI.
@@ -42,8 +60,15 @@ kubectl create -f prometheus.yaml
 cd ..
 
 # Let's deploy Prometheus
+# prometheus-scratch.yaml is for non-persistent deployment of Prometheus
+# prometheus-simple.yaml is for deploying Prometheus using a pre-created ScaleIO volume named prometheus
+# prometheus-dynamic.yaml is for deploying Prometheus using a k8s persistent volume claim
 cd deployments
 kubectl create -f prometheus-scratch.yaml
+OR
+kubectl create -f prometheus-simple.yaml
+OR
+kubectl create -f prometheus-dynamic.yaml
 cd ..
 </pre>
 
@@ -80,5 +105,10 @@ kubectl delete service frontend
 kubectl delete service backend
 kubectl delete service prometheus --namespace=kube-system
 kubectl delete service zipkin --namespace=kube-system
+kubectl delete storageclass sio-small
+kubectl delete persistentvolumeclaim pvc-sio-small
+kubectl delete persistentvolumeclaim pvc-sio-small --namespace=kube-system
+kubectl delete secret sio-secret
+kubectl delete secret sio-secret --namespace=kube-system
 kubectl delete configmap prometheus --namespace=kube-system
 </pre>
