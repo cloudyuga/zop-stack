@@ -3,13 +3,13 @@
 ## Building the Docker Images
 backend:
 ./build.sh
-docker build -t dvonthenen/backend .
-docker push dvonthenen/backend:latest
+docker build -t dvonthenen/zop-backend .
+docker push dvonthenen/zop-backend:latest
 
 frontend:
 ./build.sh
-docker build -t dvonthenen/frontend .
-docker push dvonthenen/frontend:latest
+docker build -t dvonthenen/zop-frontend .
+docker push dvonthenen/zop-frontend:latest
 
 
 ## ScaleIO Clean Up

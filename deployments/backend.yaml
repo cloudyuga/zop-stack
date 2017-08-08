@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: "dvonthenen/backend:latest"
+          image: "dvonthenen/zop-backend:latest"
           imagePullPolicy: Always
           env:
             - name: POD_IP
